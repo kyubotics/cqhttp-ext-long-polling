@@ -1,4 +1,4 @@
-# CoolQ HTTP API 插件
+# CoolQ HTTP API 插件 - 长轮询扩展
 
 [![License](https://img.shields.io/badge/license-MIT%20License-blue.svg)](LICENSE)
 [![Release](https://img.shields.io/github/release/richardchien/cqhttp-ext-long-polling.svg)](https://github.com/richardchien/cqhttp-ext-long-polling/releases)
