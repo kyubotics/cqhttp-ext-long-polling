@@ -6,11 +6,17 @@
 template <class Elem>
 class Channel {
 public:
+    Channel() : max_size_(0) {}
+    Channel(const size_t max_size) : max_size_(max_size) {}
+
     void put(const Elem &elem) {
         std::unique_lock<std::mutex> lock(m_);
 
         if (promise_queue_.empty()) {
             // there is no promise at present, so we put the element into the queue
+            if (max_size_ != 0 && elem_queue_.size() >= max_size_) {
+                elem_queue_.pop_front();
+            }
             elem_queue_.push_back(elem);
             return;
         }
@@ -52,4 +58,5 @@ private:
     std::list<Elem> elem_queue_;
     std::list<std::shared_ptr<std::promise<Elem>>> promise_queue_;
     std::mutex m_;
+    size_t max_size_;
 };

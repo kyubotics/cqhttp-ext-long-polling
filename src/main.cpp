@@ -6,6 +6,8 @@ using namespace std;
 using namespace cqhttp::extension;
 using nlohmann::json;
 
+static const int RETCODE_CONFLICT = 10100;
+
 struct LongPolling : Extension {
     Info info() const override {
         Info i;
@@ -16,10 +18,31 @@ struct LongPolling : Extension {
         return i;
     }
 
-    void on_event(EventContext &ctx) override { chan_.put(ctx.data); }
+#define CONF_PREFIX "long_polling."
+
+    void on_create(Context &ctx) override {
+        enable_ = ctx.get_config_bool(CONF_PREFIX "enable", false);
+        if (enable_) {
+            auto max_queue_size = max({ctx.get_config_integer(CONF_PREFIX "max_queue_size", 2000), 0LL});
+            chan_ = make_shared<Channel<json>>(max_queue_size);
+        }
+    }
+
+    void on_event(EventContext &ctx) override {
+        if (enable_) {
+            chan_->put(ctx.data);
+        }
+    }
 
     void on_missed_action(ActionContext &ctx) override {
-        if (ctx.action != "get_updates") {
+        if (!enable_ || ctx.action != "get_updates") {
+            return;
+        }
+
+        const unique_lock<mutex> lock(mtx_, try_to_lock);
+        if (!lock) {
+            // there is another request getting updates now
+            ctx.result.code = RETCODE_CONFLICT;
             return;
         }
 
@@ -35,7 +58,7 @@ struct LongPolling : Extension {
         ctx.result.data = json::array();
 
         json event;
-        while (chan_.get(event, false)) {
+        while (chan_->get(event, false)) {
             // get events ready in channel
             ctx.result.data.push_back(event);
             if (ctx.result.data.size() >= limit) {
@@ -47,15 +70,18 @@ struct LongPolling : Extension {
             // we've got events, or we couldn't wait
             return;
         }
-        chan_.get(event, true, timeout * 1000);
-        ctx.result.data.push_back(event);
-        while (ctx.result.data.size() < limit && chan_.get(event, false)) {
+        if (chan_->get(event, true, timeout * 1000)) {
+            ctx.result.data.push_back(event);
+        }
+        while (ctx.result.data.size() < limit && chan_->get(event, false)) {
             ctx.result.data.push_back(event);
         }
     }
 
 private:
-    Channel<json> chan_;
+    bool enable_{};
+    shared_ptr<Channel<json>> chan_;
+    mutex mtx_;
 };
 
 PLUGIN_CREATOR { return make_shared<LongPolling>(); }
