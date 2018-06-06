@@ -11,7 +11,7 @@
 
 API 请求方式和 HTTP API 插件正常的请求一样。
 
-### `/get_updates` 发送私聊消息
+### `/get_updates` 获取更新
 
 #### 参数
 
