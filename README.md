@@ -7,7 +7,7 @@
 
 ## 使用方式
 
-将 `LongPolling.dll` 放到酷 Q 的 `app\io.github.richardchien.coolqhttpapi\extensions` 目录下，然后配置文件中添加 `long_polling.enable = true`，**并将 `server_thread_pool_size` 设为大于 2 的值**，然后重启插件即可。
+将 `LongPolling.dll` 放到酷 Q 的 `app\io.github.richardchien.coolqhttpapi\extensions` 目录下（没有则创建），然后配置文件中添加 `long_polling.enable = true`，**并将 `server_thread_pool_size` 设为大于 2 的值**，然后重启插件即可。
 
 默认在队列中保留 2000 条消息，可通过 `long_polling.max_queue_size` 设置（0 表示不限制队列大小，谨慎使用）。
 
