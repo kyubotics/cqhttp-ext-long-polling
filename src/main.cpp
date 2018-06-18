@@ -10,7 +10,7 @@ static const int RETCODE_CONFLICT = 10100;
 
 struct LongPolling : Extension {
     Info info() const override {
-        Info i;
+        static Info i;
         i.name = "长轮询";
         i.version = "0.0.1";
         i.build_number = 1;
@@ -25,6 +25,7 @@ struct LongPolling : Extension {
         if (enable_) {
             auto max_queue_size = max({ctx.get_config_integer(CONF_PREFIX "max_queue_size", 2000), 0LL});
             chan_ = make_shared<Channel<json>>(max_queue_size);
+            logger.debug(u8"事件数据缓冲队列创建成功");
         }
     }
 
@@ -42,6 +43,7 @@ struct LongPolling : Extension {
         const unique_lock<mutex> lock(mtx_, try_to_lock);
         if (!lock) {
             // there is another request getting updates now
+            logger.debug(u8"有多个请求尝试调用 get_updates，已拒绝");
             ctx.result.code = RETCODE_CONFLICT;
             return;
         }
