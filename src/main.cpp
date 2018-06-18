@@ -86,4 +86,4 @@ private:
     mutex mtx_;
 };
 
-PLUGIN_CREATOR { return make_shared<LongPolling>(); }
+EXTENSION_CREATOR { return make_shared<LongPolling>(); }
