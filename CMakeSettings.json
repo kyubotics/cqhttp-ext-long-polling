@@ -44,6 +44,10 @@
             "ctestCommandArgs": "",
             "variables": [
                 {
+                    "name": "CQHTTP_PROJECT_DIR",
+                    "value": "${env.CQHTTP_PROJECT_DIR}"
+                },
+                {
                     "name": "CMAKE_TOOLCHAIN_FILE",
                     "value": "${env.VCPKG_CMAKE}"
                 },
