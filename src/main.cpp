@@ -12,8 +12,8 @@ struct LongPolling : Extension {
     Info info() const override {
         static Info i;
         i.name = "长轮询";
-        i.version = "0.0.1";
-        i.build_number = 1;
+        i.version = "0.0.2";
+        i.build_number = 2;
         i.description = "提供类似于 Telegram Bot API 的长轮询接口。";
         return i;
     }
