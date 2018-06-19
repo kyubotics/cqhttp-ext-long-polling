@@ -28,4 +28,4 @@ API 请求方式和 HTTP API 插件正常的请求一样。
 
 #### 响应数据
 
-`data` 字段为事件数据的数组。
+`data` 字段为事件数据的数组，**但是需要注意，`enable_backward_compatibility` 和 `post_message_format` 配置项不会影响到这里的事件数据，数据字段始终是 4.x 版本的，而消息格式始终是数组**。
