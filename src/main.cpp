@@ -65,7 +65,7 @@ struct LongPolling : Extension {
             ctx.result.data.push_back(event);
             if (ctx.result.data.size() >= limit) {
                 // it's enough
-                return;
+                break;
             }
         }
         if (timeout == 0 || !ctx.result.data.empty()) {
@@ -74,9 +74,9 @@ struct LongPolling : Extension {
         }
         if (chan_->get(event, true, timeout * 1000)) {
             ctx.result.data.push_back(event);
-        }
-        while (ctx.result.data.size() < limit && chan_->get(event, false)) {
-            ctx.result.data.push_back(event);
+            while (ctx.result.data.size() < limit && chan_->get(event, false)) {
+                ctx.result.data.push_back(event);
+            }
         }
     }
 

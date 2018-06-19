@@ -23,6 +23,7 @@ public:
 
         auto promise = promise_queue_.front();
         promise_queue_.pop_front();
+        lock.unlock();
         promise->set_value(elem);
     }
 
@@ -51,6 +52,8 @@ public:
             out = future.get();
             return true;
         }
+        lock.lock();
+        promise_queue_.remove(promise);
         return false;
     }
 
